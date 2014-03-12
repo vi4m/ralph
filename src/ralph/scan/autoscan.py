@@ -63,7 +63,11 @@ def autoscan_network(network, queue_name=None):
                 "environment {0}.".format(network),
             )
         queue_name = network.environment.queue.name
-    queue = django_rq.get_queue(queue_name)
+    try:
+        queue = django_rq.get_queue(queue_name)
+    except  KeyError:
+        raise UserWarning("Queue not known. Please add %s to RQ_QUEUE_LIST in "
+                          "your settings file." % queue_name)
     for group in _split_into_groups(
         network.network.iterhosts(),
         ADDRESS_GROUP_SIZE,

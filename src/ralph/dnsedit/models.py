@@ -14,7 +14,6 @@ from powerdns.models import Record
 from django.db.models.signals import post_save, pre_delete
 from django.dispatch import receiver
 
-from ralph.discovery.history import field_changes
 
 
 class DHCPEntry(TimeTrackable):
@@ -83,19 +82,21 @@ class DNSHistory(db.Model):
         verbose_name_plural = _("DNS History entries")
 
 
-@receiver(post_save, sender=Record, dispatch_uid='ralph.history.dns')
-def record_post_save(sender, instance, raw, using, **kwargs):
-    for field, orig, new in field_changes(instance, ignore={
-            'last_seen', 'change_date', 'id'}):
-        DNSHistory(
-            record_name=instance.name,
-            record_type=instance.type,
-            field_name=field,
-            old_value=unicode(orig),
-            new_value=unicode(new),
-            user=getattr(instance, 'saving_user', None),
-            device=getattr(instance, 'saving_device', None),
-        ).save()
+#FIXME:
+# no such field_changes
+# @receiver(post_save, sender=Record, dispatch_uid='ralph.history.dns')
+# def record_post_save(sender, instance, raw, using, **kwargs):
+#     for field, orig, new in field_changes(instance, ignore={
+#             'last_seen', 'change_date', 'id'}):
+#         DNSHistory(
+#             record_name=instance.name,
+#             record_type=instance.type,
+#             field_name=field,
+#             old_value=unicode(orig),
+#             new_value=unicode(new),
+#             user=getattr(instance, 'saving_user', None),
+#             device=getattr(instance, 'saving_device', None),
+#         ).save()
 
 
 @receiver(pre_delete, sender=Record, dispatch_uid='ralph.history.dns')

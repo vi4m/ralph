@@ -11,7 +11,7 @@ import re
 from django import forms
 from django.utils.translation import ugettext_lazy as _
 
-from ralph.discovery.models import Network, NetworkKind
+from ralph_assets.models import Network, NetworkKind
 
 
 class NetworksFilterForm(forms.Form):

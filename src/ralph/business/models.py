@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#-*- coding: utf-8 -*-
 
 from __future__ import absolute_import
 from __future__ import division
@@ -12,19 +12,19 @@ from django.conf import settings
 from django.db import models as db
 from django.utils.translation import ugettext_lazy as _
 from lck.django.common.models import Named, TimeTrackable
-from lck.django.common.models import WithConcurrentGetOrCreate
+# from lck.django.common.models import WithConcurrentGetOrCreate
 from dj.choices import Choices
 from dj.choices.fields import ChoiceField
-from django.db.models.signals import pre_save, pre_delete
-from django.dispatch import receiver
+# from django.db.models.signals import pre_save, pre_delete
+# from django.dispatch import receiver
 
-from ralph.discovery.history import field_changes as _field_changes
-from ralph.discovery.models import DataCenter
-from ralph.discovery.models_history import HistoryChange
-from ralph.discovery.models_util import SavingUser
-from ralph.util.di import get_extra_data
+# from ralph.discovery.history import field_changes as _field_changes
+# from ralph.discovery.models import DataCenter
+# from ralph.discovery.models_history import HistoryChange
+# from ralph.discovery.models_util import SavingUser
+# from ralph.util.di import get_extra_data
 
-SYNERGY_URL_BASE = settings.SYNERGY_URL_BASE
+# SYNERGY_URL_BASE = settings.SYNERGY_URL_BASE
 
 
 class PrebootMixin(db.Model):
@@ -69,150 +69,6 @@ class HasSymbolBasedPath(db.Model):
             child.save()
 
 
-class BusinessSegment(Named):
-    pass
-
-
-class ProfitCenter(Named):
-    description = db.TextField(null=True, default=None)
-
-    def __unicode__(self):
-        return '{} - {}'.format(self.name, self.description)
-
-
-class Venture(Named, PrebootMixin, HasSymbolBasedPath, TimeTrackable):
-    data_center = db.ForeignKey(
-        DataCenter,
-        verbose_name=_("data center"),
-        null=True,
-        blank=True,
-    )
-    parent = db.ForeignKey(
-        'self',
-        verbose_name=_("parent venture"),
-        null=True,
-        blank=True,
-        default=None,
-        related_name="child_set",
-    )
-    symbol = db.CharField(
-        verbose_name=_("symbol"),
-        max_length=32,
-        blank=True,
-        default="",
-    )
-    show_in_ralph = db.BooleanField(
-        verbose_name=_("show in ralph"),
-        default=False,
-    )
-    is_infrastructure = db.BooleanField(
-        verbose_name=_("this is part of infrastructure"),
-        default=False,
-    )
-    margin_kind = db.ForeignKey(
-        'discovery.MarginKind',
-        verbose_name=_("margin kind"),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=db.SET_NULL
-    )
-    department = db.ForeignKey(
-        'business.Department',
-        verbose_name=_("department"),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=db.SET_NULL
-    )
-    business_segment = db.ForeignKey(
-        BusinessSegment,
-        verbose_name=_("Business segment"),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=db.SET_NULL,
-    )
-    profit_center = db.ForeignKey(
-        ProfitCenter,
-        verbose_name=_("Profit center"),
-        null=True,
-        blank=True,
-        default=None,
-        on_delete=db.SET_NULL,
-    )
-    verified = db.BooleanField(verbose_name=_("verified"), default=False)
-
-    class Meta:
-        verbose_name = _("venture")
-        verbose_name_plural = _("ventures")
-        unique_together = ('parent', 'symbol')
-        ordering = ('parent__symbol', 'symbol')
-
-    def clean(self):
-        self.symbol = re.sub(r'[^\w]', '.', self.symbol).lower()
-
-    def save(self, *args, **kwargs):
-        if self.parent:
-            self.path = self.parent.path + "/" + self.symbol
-        else:
-            self.path = self.symbol
-        super(Venture, self).save(*args, **kwargs)
-        for child in self.child_set.all():
-            child.save()
-
-    @db.permalink
-    def get_absolute_url(self):
-        return ("business-show-venture", (), {'venture_id': self.id})
-
-    def all_ownerships(self):
-        return get_extra_data('ralph_obj_all_ownerships', self) or []
-
-    def get_data_center(self):
-        if self.data_center:
-            return self.data_center
-        if self.parent:
-            return self.parent.get_data_center()
-
-    def get_margin(self):
-        venture = self
-        while venture:
-            if venture.margin_kind:
-                return venture.margin_kind.margin
-            venture = venture.parent
-        return 0
-
-    def get_department(self):
-        if self.department:
-            return self.department
-        if self.parent:
-            return self.parent.get_department()
-
-    def find_descendant_ids(self):
-        """ Return Venture id and all descendants id """
-        stack = [self.id]
-        venture_ids = []
-        visited = {self.id}
-        while stack:
-            venture_id = stack.pop()
-            venture_ids.append(venture_id)
-            for v_id, in Venture.objects.filter(
-                    parent_id=venture_id
-            ).values_list('id'):
-                if v_id in visited:
-                    # Make sure we don't do the same device twice.
-                    continue
-                visited.add(v_id)
-                stack.append(v_id)
-        return venture_ids
-
-    @property
-    def device(self):
-        return self.device_set
-
-    @property
-    def venturerole(self):
-        return self.venturerole_set
 
 
 class Service(db.Model):
@@ -257,9 +113,9 @@ class BusinessLine(db.Model):
         return self.name
 
 
-class VentureRole(Named.NonUnique, PrebootMixin, HasSymbolBasedPath,
+class PuppetVentureRole(Named.NonUnique, PrebootMixin, HasSymbolBasedPath,
                   TimeTrackable):
-    venture = db.ForeignKey(Venture, verbose_name=_("venture"))
+    puppet_venture = db.ForeignKey('PuppetVenture', verbose_name=_("puppet venture"))
     parent = db.ForeignKey(
         'self',
         verbose_name=_("parent role"),
@@ -270,7 +126,7 @@ class VentureRole(Named.NonUnique, PrebootMixin, HasSymbolBasedPath,
     )
 
     class Meta:
-        unique_together = ('name', 'venture')
+        unique_together = ('name', 'puppet_venture')
         verbose_name = _("venture role")
         verbose_name_plural = _("venture roles")
         ordering = ('parent__name', 'name')
@@ -294,10 +150,6 @@ class VentureRole(Named.NonUnique, PrebootMixin, HasSymbolBasedPath,
     def symbol(self):
         # for HasSymbolBasedPath
         return self.name
-
-    @property
-    def device(self):
-        return self.device_set
 
     @property
     def roleproperty(self):
@@ -339,102 +191,110 @@ class VentureRole(Named.NonUnique, PrebootMixin, HasSymbolBasedPath,
         return types
 
 
-class RolePropertyType(db.Model):
-    symbol = db.CharField(
-        verbose_name=_("symbol"),
-        max_length=32,
-        null=True,
-        default=None,
-        unique=True,
-    )
+
+class ProfitCenter(Named):
+    description = db.TextField(null=True, default=None)
 
     def __unicode__(self):
-        return self.symbol
-
-    class Meta:
-        verbose_name = _("property type")
-        verbose_name_plural = _("property types")
+        return '{} - {}'.format(self.name, self.description)
 
 
-class RolePropertyTypeValue(db.Model):
-    type = db.ForeignKey(
-        RolePropertyType,
-        verbose_name=_("type"),
-        null=True,
-        blank=True,
-        default=None,
-    )
-    value = db.TextField(verbose_name=_("value"), null=True, default=None)
+# class RolePropertyType(db.Model):
+#     symbol = db.CharField(
+#         verbose_name=_("symbol"),
+#         max_length=32,
+#         null=True,
+#         default=None,
+#         unique=True,
+#     )
 
-    class Meta:
-        verbose_name = _("property type value")
-        verbose_name_plural = _("property type values")
+#     def __unicode__(self):
+#         return self.symbol
 
-
-class RoleProperty(db.Model):
-    symbol = db.CharField(
-        verbose_name=_("symbol"),
-        max_length=32,
-        null=True,
-        default=None
-    )
-    role = db.ForeignKey(
-        VentureRole,
-        verbose_name=_("role"),
-        null=True,
-        blank=True,
-        default=None,
-    )
-    venture = db.ForeignKey(
-        Venture,
-        verbose_name=_("venture"),
-        null=True,
-        blank=True,
-        default=None,
-    )
-    type = db.ForeignKey(
-        RolePropertyType,
-        verbose_name=_("type"),
-        null=True,
-        blank=True,
-        default=None,
-    )
-    default = db.TextField(
-        verbose_name=_("default value"), null=True, default=None, blank=True)
-
-    class Meta:
-        unique_together = [
-            ('symbol', 'role'),
-            ('symbol', 'venture'),
-        ]
-        verbose_name = _("property")
-        verbose_name_plural = _("properties")
-
-    def __unicode__(self):
-        return self.symbol
+#     class Meta:
+#         verbose_name = _("property type")
+#         verbose_name_plural = _("property types")
 
 
-class RolePropertyValue(TimeTrackable, WithConcurrentGetOrCreate, SavingUser):
-    property = db.ForeignKey(
-        RoleProperty,
-        verbose_name=_("property"),
-        null=True,
-        blank=True,
-        default=None,
-    )
-    device = db.ForeignKey(
-        'discovery.Device',
-        verbose_name=_("property"),
-        null=True,
-        blank=True,
-        default=None,
-    )
-    value = db.TextField(verbose_name=_("value"), null=True, default=None)
+# class RolePropertyTypeValue(db.Model):
+#     type = db.ForeignKey(
+#         RolePropertyType,
+#         verbose_name=_("type"),
+#         null=True,
+#         blank=True,
+#         default=None,
+#     )
+#     value = db.TextField(verbose_name=_("value"), null=True, default=None)
 
-    class Meta:
-        unique_together = ('property', 'device')
-        verbose_name = _("property value")
-        verbose_name_plural = _("property values")
+#     class Meta:
+#         verbose_name = _("property type value")
+#         verbose_name_plural = _("property type values")
+
+
+# class RoleProperty(db.Model):
+#     symbol = db.CharField(
+#         verbose_name=_("symbol"),
+#         max_length=32,
+#         null=True,
+#         default=None
+#     )
+#     role = db.ForeignKey(
+#         VentureRole,
+#         verbose_name=_("role"),
+#         null=True,
+#         blank=True,
+#         default=None,
+#     )
+#     venture = db.ForeignKey(
+#         Venture,
+#         verbose_name=_("venture"),
+#         null=True,
+#         blank=True,
+#         default=None,
+#     )
+#     type = db.ForeignKey(
+#         RolePropertyType,
+#         verbose_name=_("type"),
+#         null=True,
+#         blank=True,
+#         default=None,
+#     )
+#     default = db.TextField(
+#         verbose_name=_("default value"), null=True, default=None, blank=True)
+
+#     class Meta:
+#         unique_together = [
+#             ('symbol', 'role'),
+#             ('symbol', 'venture'),
+#         ]
+#         verbose_name = _("property")
+#         verbose_name_plural = _("properties")
+
+#     def __unicode__(self):
+#         return self.symbol
+
+
+# class RolePropertyValue(TimeTrackable, WithConcurrentGetOrCreate, SavingUser):
+#     property = db.ForeignKey(
+#         RoleProperty,
+#         verbose_name=_("property"),
+#         null=True,
+#         blank=True,
+#         default=None,
+#     )
+#     device = db.ForeignKey(
+#         'discovery.Device',
+#         verbose_name=_("property"),
+#         null=True,
+#         blank=True,
+#         default=None,
+#     )
+#     value = db.TextField(verbose_name=_("value"), null=True, default=None)
+
+#     class Meta:
+#         unique_together = ('property', 'device')
+#         verbose_name = _("property value")
+#         verbose_name_plural = _("property values")
 
 
 class DepartmentIcon(Choices):
@@ -492,23 +352,148 @@ class Department(Named):
         ordering = ('name',)
 
 
-@receiver(pre_save, sender=RolePropertyValue, dispatch_uid='ralph.history')
-def role_property_value_pre_save(sender, instance, raw, using, **kwargs):
-    for field, orig, new in _field_changes(instance):
-        HistoryChange.objects.create(
-            device=instance.device,
-            field_name="%s (property)" % instance.property.symbol,
-            old_value=unicode(orig),
-            new_value=unicode(new),
-            user=instance.saving_user,
-        )
+
+class BusinessSegment(Named):
+    pass
 
 
-@receiver(pre_delete, sender=RolePropertyValue, dispatch_uid='ralph.history')
-def role_property_value_pre_delete(sender, instance, using, **kwargs):
-    HistoryChange.objects.create(
-        device=instance.device,
-        field_name="%s (property)" % instance.property.symbol,
-        old_value=unicode(instance.value),
-        new_value='None',
+# @receiver(pre_save, sender=RolePropertyValue, dispatch_uid='ralph.history')
+# def role_property_value_pre_save(sender, instance, raw, using, **kwargs):
+#     for field, orig, new in _field_changes(instance):
+#         HistoryChange.objects.create(
+#             device=instance.device,
+#             field_name="%s (property)" % instance.property.symbol,
+#             old_value=unicode(orig),
+#             new_value=unicode(new),
+#             user=instance.saving_user,
+#         )
+
+
+# @receiver(pre_delete, sender=RolePropertyValue, dispatch_uid='ralph.history')
+# def role_property_value_pre_delete(sender, instance, using, **kwargs):
+#     HistoryChange.objects.create(
+#         device=instance.device,
+#         field_name="%s (property)" % instance.property.symbol,
+#         old_value=unicode(instance.value),
+#         new_value='None',
+#     )
+
+
+class PuppetVenture(Named, PrebootMixin, HasSymbolBasedPath, TimeTrackable):
+    # data_center = db.ForeignKey(
+    #     DataCenter,
+    #     verbose_name=_("data center"),
+    #     null=True,
+    #     blank=True,
+    # )
+    parent = db.ForeignKey(
+        'self',
+        verbose_name=_("parent venture"),
+        null=True,
+        blank=True,
+        default=None,
+        related_name="child_set",
     )
+    symbol = db.CharField(
+        verbose_name=_("symbol"),
+        max_length=32,
+        blank=True,
+        default="",
+    )
+    #TODO: what for?
+    #show_in_ralph = db.BooleanField(
+    #    verbose_name=_("show in ralph"),
+    #    default=False,
+    #)
+    #TODO: remove it
+    #is_infrastructure = db.BooleanField(
+    #    verbose_name=_("this is part of infrastructure"),
+    #    default=False,
+    #)
+    #margin_kind = db.ForeignKey(
+    #    'discovery.MarginKind',
+    #    verbose_name=_("margin kind"),
+    #    null=True,
+    #    blank=True,
+    #    default=None,
+    #    on_delete=db.SET_NULL
+    #)
+    department = db.ForeignKey(
+        'business.Department',
+        verbose_name=_("department"),
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=db.SET_NULL
+    )
+    business_segment = db.ForeignKey(
+        BusinessSegment,
+        verbose_name=_("Business segment"),
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=db.SET_NULL,
+    )
+    profit_center = db.ForeignKey(
+        ProfitCenter,
+        verbose_name=_("Profit center"),
+        null=True,
+        blank=True,
+        default=None,
+        on_delete=db.SET_NULL,
+    )
+    verified = db.BooleanField(verbose_name=_("verified"), default=False)
+
+    class Meta:
+        verbose_name = _("venture")
+        verbose_name_plural = _("ventures")
+        unique_together = ('parent', 'symbol')
+        ordering = ('parent__symbol', 'symbol')
+
+    def clean(self):
+        self.symbol = re.sub(r'[^\w]', '.', self.symbol).lower()
+
+    def save(self, *args, **kwargs):
+        if self.parent:
+            self.path = self.parent.path + "/" + self.symbol
+        else:
+            self.path = self.symbol
+        super(Venture, self).save(*args, **kwargs)
+        for child in self.child_set.all():
+            child.save()
+
+    @db.permalink
+    def get_absolute_url(self):
+        return ("business-show-venture", (), {'venture_id': self.id})
+
+    def all_ownerships(self):
+        return get_extra_data('ralph_obj_all_ownerships', self) or []
+
+    def get_data_center(self):
+        if self.data_center:
+            return self.data_center
+        if self.parent:
+            return self.parent.get_data_center()
+
+
+    def find_descendant_ids(self):
+        """ Return Venture id and all descendants id """
+        stack = [self.id]
+        venture_ids = []
+        visited = {self.id}
+        while stack:
+            venture_id = stack.pop()
+            venture_ids.append(venture_id)
+            for v_id, in Venture.objects.filter(
+                    parent_id=venture_id
+            ).values_list('id'):
+                if v_id in visited:
+                    # Make sure we don't do the same device twice.
+                    continue
+                visited.add(v_id)
+                stack.append(v_id)
+        return venture_ids
+
+    @property
+    def venturerole(self):
+        return self.venturerole_set

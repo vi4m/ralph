@@ -17,7 +17,7 @@ from ajax_select.fields import AutoCompleteSelectField
 import ralph.cmdb.models as db
 from ralph.cmdb.models_changes import CIChangeGit
 from ralph.cmdb.updater import update_cis_layers
-from ralph.ui.widgets import ReadOnlyPreWidget
+#from ralph.ui.widgets import ReadOnlyPreWidget FIXME
 
 
 class GitPathMappingAdminForm(forms.ModelForm):
@@ -30,7 +30,7 @@ class GitPathMappingAdminForm(forms.ModelForm):
     )
     occurences = forms.CharField(
         required=False,
-        widget=ReadOnlyPreWidget(),
+#        widget=ReadOnlyPreWidget(),
     )
 
     def clean_path(self):

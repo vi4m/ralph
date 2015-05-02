@@ -14,21 +14,17 @@ from lck.django.common.models import MACAddressField
 from lck.django.common import nested_commit_on_success
 from powerdns.models import Record
 
-from ralph.business.models import VentureRole
+from ralph.business.models import PuppetVentureRole
 from ralph.deployment.models import Preboot, Deployment, DeploymentStatus
-from ralph.discovery.models import (
-    Device,
-    DeviceEnvironment,
-    DeviceType,
+from ralph_assets.models import (
     Ethernet,
     EthernetSpeed,
     IPAddress,
     Network,
-    ServiceCatalog,
 )
 from ralph.dnsedit.models import DHCPEntry
 from ralph.dnsedit.util import clean_dns_entries, reset_dns
-from ralph.util import Eth
+#FIME: from ralph.util import Eth
 from django import forms
 
 
@@ -219,35 +215,36 @@ def management_ip_unique(ip):
     return not IPAddress.objects.filter(address=ip).exists()
 
 
-def _create_device(data):
-    ethernets = [Eth(
-        'DEPLOYMENT MAC',
-        MACAddressField.normalize(data['mac']),
-        EthernetSpeed.unknown
-    )]
-    dev = Device.create(
-        ethernets=ethernets, model_type=DeviceType.unknown,
-        model_name='Unknown',
-        verified=True,
-    )
-    dev.name = data['hostname']
-    try:
-        dev.parent = Device.objects.get(sn=data['rack_sn'])
-    except Device.DoesNotExist:
-        pass
-    dev.save()
-    IPAddress.objects.create(
-        address=data['ip'],
-        device=dev,
-        hostname=data['hostname'],
-    )
-    if management_ip_unique(data['management_ip']):
-        IPAddress.objects.create(
-            address=data['management_ip'],
-            device=dev,
-            is_management=True
-        )
-    return dev
+# FIXME:
+# def _create_device(data):
+#     ethernets = [Eth(
+#         'DEPLOYMENT MAC',
+#         MACAddressField.normalize(data['mac']),
+#         EthernetSpeed.unknown
+#     )]
+#     dev = Device.create(
+#         ethernets=ethernets, model_type=DeviceType.unknown,
+#         model_name='Unknown',
+#         verified=True,
+#     )
+#     dev.name = data['hostname']
+#     try:
+#         dev.parent = Device.objects.get(sn=data['rack_sn'])
+#     except Device.DoesNotExist:
+#         pass
+#     dev.save()
+#     IPAddress.objects.create(
+#         address=data['ip'],
+#         device=dev,
+#         hostname=data['hostname'],
+#     )
+#     if management_ip_unique(data['management_ip']):
+#         IPAddress.objects.create(
+#             address=data['management_ip'],
+#             device=dev,
+#             is_management=True
+#         )
+#     return dev
 
 
 @nested_commit_on_success

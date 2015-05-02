@@ -11,7 +11,7 @@ from django.template.defaultfilters import slugify
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
-from ralph.discovery.models import DeviceModel, Device
+#from ralph.discovery.models import DeviceModel, Device
 from ralph.util import presentation
 
 
@@ -104,97 +104,97 @@ class ReadOnlyPreWidget(forms.Widget):
             escape(name), escape(value), escape(value)))
 
 
-class DeviceModelWidget(forms.Widget):
+# class DeviceModelWidget(forms.Widget):
 
-    def render(self, name, value, attrs=None, choices=()):
-        dm = None
-        if value:
-            try:
-                dm = DeviceModel.objects.get(id=value)
-            except DeviceModel.DoesNotExist:
-                pass
-        if dm is None:
-            output = [
-                '<input type="hidden" name="%s" value="">' % (escape(name),),
-                '<div class="input uneditable-input">',
-                '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
-                    presentation.get_device_model_icon(None), 'None'),
-                '</div>',
-            ]
-        else:
-            output = [
-                '<input type="hidden" name="%s" value="%s">' % (escape(name),
-                                                                escape(value)),
-                '<div class="input uneditable-input">',
-                '<a href="/admin/discovery/devicemodel/%s">'
-                '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (dm.id,
-                                                               presentation.get_device_model_icon(dm), escape(dm.name)),
-                '</div>',
-            ]
-        return mark_safe('\n'.join(output))
-
-
-class DeviceWidget(forms.Widget):
-
-    def render(self, name, value, attrs=None, choices=()):
-        dev = None
-        if value:
-            try:
-                dev = Device.objects.get(id=value)
-            except Device.DoesNotExist:
-                pass
-        if dev is None:
-            output = [
-                '<input type="hidden" name="%s" value="">' % (escape(name),),
-                '<div class="input uneditable-input">',
-                '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
-                    presentation.get_device_icon(None), 'None'),
-                '</div>',
-            ]
-        else:
-            output = [
-                '<input type="hidden" name="%s" value="%s">' % (escape(name),
-                                                                escape(value)),
-                '<div class="input uneditable-input">',
-                '<a href="%s">'
-                '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (dev.id,
-                                                               presentation.get_device_icon(dev), escape(dev.name)),
-                '</div>',
-            ]
-        return mark_safe('\n'.join(output))
+#     def render(self, name, value, attrs=None, choices=()):
+#         dm = None
+#         if value:
+#             try:
+#                 dm = DeviceModel.objects.get(id=value)
+#             except DeviceModel.DoesNotExist:
+#                 pass
+#         if dm is None:
+#             output = [
+#                 '<input type="hidden" name="%s" value="">' % (escape(name),),
+#                 '<div class="input uneditable-input">',
+#                 '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
+#                     presentation.get_device_model_icon(None), 'None'),
+#                 '</div>',
+#             ]
+#         else:
+#             output = [
+#                 '<input type="hidden" name="%s" value="%s">' % (escape(name),
+#                                                                 escape(value)),
+#                 '<div class="input uneditable-input">',
+#                 '<a href="/admin/discovery/devicemodel/%s">'
+#                 '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (dm.id,
+#                                                                presentation.get_device_model_icon(dm), escape(dm.name)),
+#                 '</div>',
+#             ]
+#         return mark_safe('\n'.join(output))
 
 
-class RackWidget(forms.Widget):
+# class DeviceWidget(forms.Widget):
 
-    def render(self, name, value, attrs=None, choices=()):
-        dev = None
-        if value:
-            try:
-                dev = Device.objects.get(sn=(value or '').lower())
-            except Device.DoesNotExist:
-                pass
-        if dev is None:
-            output = [
-                '<input type="hidden" name="%s" value="">' % (escape(name),),
-                '<div class="input uneditable-input">',
-                '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
-                    presentation.get_device_icon(None), 'None'),
-                '</div>',
-            ]
-        else:
-            output = [
-                '<input type="hidden" name="%s" value="%s">' % (escape(name),
-                                                                escape(value)),
-                '<div class="input uneditable-input">',
-                '<a href="/ui/racks/sn-%s/info/">'
-                '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
-                    slugify(dev.sn),
-                    presentation.get_device_icon(dev),
-                    escape(dev.name),
-                ),
-                '</div>',
-            ]
-        return mark_safe('\n'.join(output))
+#     def render(self, name, value, attrs=None, choices=()):
+#         dev = None
+#         if value:
+#             try:
+#                 dev = Device.objects.get(id=value)
+#             except Device.DoesNotExist:
+#                 pass
+#         if dev is None:
+#             output = [
+#                 '<input type="hidden" name="%s" value="">' % (escape(name),),
+#                 '<div class="input uneditable-input">',
+#                 '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
+#                     presentation.get_device_icon(None), 'None'),
+#                 '</div>',
+#             ]
+#         else:
+#             output = [
+#                 '<input type="hidden" name="%s" value="%s">' % (escape(name),
+#                                                                 escape(value)),
+#                 '<div class="input uneditable-input">',
+#                 '<a href="%s">'
+#                 '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (dev.id,
+#                                                                presentation.get_device_icon(dev), escape(dev.name)),
+#                 '</div>',
+#             ]
+#         return mark_safe('\n'.join(output))
+
+
+# class RackWidget(forms.Widget):
+
+#     def render(self, name, value, attrs=None, choices=()):
+#         dev = None
+#         if value:
+#             try:
+#                 dev = Device.objects.get(sn=(value or '').lower())
+#             except Device.DoesNotExist:
+#                 pass
+#         if dev is None:
+#             output = [
+#                 '<input type="hidden" name="%s" value="">' % (escape(name),),
+#                 '<div class="input uneditable-input">',
+#                 '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
+#                     presentation.get_device_icon(None), 'None'),
+#                 '</div>',
+#             ]
+#         else:
+#             output = [
+#                 '<input type="hidden" name="%s" value="%s">' % (escape(name),
+#                                                                 escape(value)),
+#                 '<div class="input uneditable-input">',
+#                 '<a href="/ui/racks/sn-%s/info/">'
+#                 '<i class="fugue-icon %s"></i>&nbsp;%s</a>' % (
+#                     slugify(dev.sn),
+#                     presentation.get_device_icon(dev),
+#                     escape(dev.name),
+#                 ),
+#                 '</div>',
+#             ]
+#         return mark_safe('\n'.join(output))
 
 
 class DateWidget(forms.DateInput):

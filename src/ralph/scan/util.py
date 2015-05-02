@@ -11,9 +11,8 @@ from collections import namedtuple
 import datetime
 from django.utils import timezone
 
-from ralph.discovery.models import Network
+from ralph_assets.models import Network, Asset
 from ralph.scan.models import ScanSummary
-from ralph_assets.models import Asset
 
 
 def find_network(network_spec):

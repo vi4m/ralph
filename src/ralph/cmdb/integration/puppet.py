@@ -11,7 +11,8 @@ import re
 
 from restkit.errors import Unauthorized
 
-from ralph.business.models import Venture
+# from ralph.business.models import Venture
+# FIXME: Venture
 from ralph.util import plugin
 from ralph.cmdb.integration.lib.fisheye import Fisheye
 from ralph.cmdb.integration.lib.puppet_yaml import load

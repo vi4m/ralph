@@ -7,8 +7,6 @@ from __future__ import unicode_literals
 
 import re
 
-import ralph.discovery.models_device as discovery_models
-
 from django.db import models as db
 from lck.django.common import nested_commit_on_success
 from lck.django.common.models import MACAddressField
@@ -204,26 +202,26 @@ def set_txt_record(domain, name, title, value):
     record.save()
 
 
-def get_location(device):
-    location = []
-    node = device
-    while node:
-        position = node.get_position() or ''
-        if position:
-            position = ' [%s]' % position
-        location.append(node.name + position)
-        node = node.parent
-    return " / ".join(reversed(location))
+# def get_location(device):
+#     location = []
+#     node = device
+#     while node:
+#         position = node.get_position() or ''
+#         if position:
+#             position = ' [%s]' % position
+#         location.append(node.name + position)
+#         node = node.parent
+#     return " / ".join(reversed(location))
 
 
-def get_model(device):
-    if not device.model:
-        return ''
-    model = '[%s] %s' % (
-        discovery_models.DeviceType.name_from_id(device.model.type),
-        device.model.name
-    )
-    return model
+# def get_model(device):
+#     if not device.model:
+#         return ''
+#     model = '[%s] %s' % (
+#         discovery_models.DeviceType.name_from_id(device.model.type),
+#         device.model.name
+#     )
+#     return model
 
 
 @nested_commit_on_success

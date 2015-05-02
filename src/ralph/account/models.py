@@ -25,7 +25,7 @@ from lck.django.profile.models import (
     GravatarSupport,
 )
 
-from ralph.business.models import Venture, VentureRole
+#from ralph.business.models import Venture, VentureRole
 
 
 class AvailableHomePage(Choices):
@@ -221,22 +221,23 @@ class BoundPerm(TimeTrackable, EditorTrackable):
         default=None,
     )
     perm = ChoiceField(verbose_name=_("permission"), choices=Perm)
-    venture = db.ForeignKey(
-        Venture,
-        verbose_name=_("venture"),
-        null=True,
-        blank=True,
-        default=None,
-    )
-    role = db.ForeignKey(
-        VentureRole,
-        verbose_name=_("venture role"),
-        null=True,
-        blank=True,
-        default=None,
-        help_text=_("if left empty, the permission applies to all roles "
-                    "within the selected venture"),
-    )
+    # FIXME: we don't need this
+    # venture = db.ForeignKey(
+    #     Venture,
+    #     verbose_name=_("venture"),
+    #     null=True,
+    #     blank=True,
+    #     default=None,
+    # )
+    # role = db.ForeignKey(
+    #     VentureRole,
+    #     verbose_name=_("venture role"),
+    #     null=True,
+    #     blank=True,
+    #     default=None,
+    #     help_text=_("if left empty, the permission applies to all roles "
+    #                 "within the selected venture"),
+    # )
 
     class Meta:
         verbose_name = _("bound permission")

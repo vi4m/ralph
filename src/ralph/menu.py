@@ -58,7 +58,7 @@ class Menu(object):
 
 class CoreMenu(Menu):
     module = MenuItem(
-        'Core',
+        'Deploy',
         name='module_core',
         fugue_icon='fugue-processor',
         view_name='ventures',

@@ -129,7 +129,8 @@ __all__ = [
 ]
 
 # hook signals, don't remove this.
-import ralph.cmdb.models_signals  # noqa
+# TODO: disabled
+#import ralph.cmdb.models_signals  # noqa
 
 
 class CILookup(LookupChannel):

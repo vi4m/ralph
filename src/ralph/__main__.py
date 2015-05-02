@@ -44,8 +44,8 @@ def ubuntu_1020872_workaround():
 
 
 def main():
-    if sys.platform.startswith('linux'):
-        ubuntu_1020872_workaround()
+    #if sys.platform.startswith('linux'):
+    #    ubuntu_1020872_workaround()
 
     os.environ["DJANGO_SETTINGS_MODULE"] = "ralph.settings"
 

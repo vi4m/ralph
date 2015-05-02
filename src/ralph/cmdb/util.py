@@ -10,7 +10,7 @@ from bob.data_table import DataTableColumn
 from django.db.models import Q
 
 from ralph.cmdb.models import CI, CI_STATE_TYPES, CI_TYPES
-from ralph.discovery.models import Device
+from ralph_assets.models import Asset # FIXME: with Device
 
 
 def report_filters(cls, order, filters=None):

@@ -19,9 +19,8 @@ import django_rq
 
 from django.conf import settings
 
-from ralph.util.network import ping
-from ralph.discovery.http import get_http_family
-from ralph.discovery.models import IPAddress, Network
+from ralph.networks.utils import ping
+from ralph_assets.models import IPAddress, Network
 from ralph.scan.snmp import get_snmp
 from ralph.scan.errors import NoQueueError
 
@@ -182,3 +181,15 @@ def autoscan_address(address):
                 ipaddress.snmp_community = None
                 ipaddress.snmp_version = None
             ipaddress.save(update_last_seen=False)
+
+
+
+#!/usr/bin/env python
+# # -*- coding: utf-8 -*-
+
+# from __future__ import absolute_import
+# from __future__ import division
+# from __future__ import print_function
+# from __future__ import unicode_literals
+
+# import socket

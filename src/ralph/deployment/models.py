@@ -19,7 +19,6 @@ from lck.django.common.models import (
     WithConcurrentGetOrCreate, EditorTrackable,
 )
 
-from ralph.discovery.models import Device, DeviceEnvironment, ServiceCatalog
 
 
 class DeploymentStatus(Choices):
@@ -136,7 +135,8 @@ class AbstractDeployment(db.Model):
         verbose_name=_("last status change"),
         help_text=_("the date of the last status change"),
     )
-    device = db.ForeignKey(Device)
+    # TODO: fixme
+    #device = db.ForeignKey(Asset)
     mac = MACAddressField()
     status = db.IntegerField(
         choices=DeploymentStatus(),
@@ -149,30 +149,32 @@ class AbstractDeployment(db.Model):
         null=True,
         on_delete=db.SET_NULL,
     )
-    venture = db.ForeignKey(
-        'business.Venture',
-        verbose_name=_("venture"),
-        null=True,
-        on_delete=db.SET_NULL,
-    )
-    venture_role = db.ForeignKey(
-        'business.VentureRole',
-        null=True,
-        verbose_name=_("role"),
-        on_delete=db.SET_NULL,
-    )
-    service = db.ForeignKey(
-        ServiceCatalog,
-        default=None,
-        null=True,
-        on_delete=db.SET_NULL,
-    )
-    device_environment = db.ForeignKey(
-        DeviceEnvironment,
-        default=None,
-        null=True,
-        on_delete=db.SET_NULL,
-    )
+    # venture = db.ForeignKey(
+    #     'business.PuppetVenture',
+    #     verbose_name=_("venture"),
+    #     null=True,
+    #     on_delete=db.SET_NULL,
+    # )
+    # venture_role = db.ForeignKey(
+    #     'business.PuppetVentureRole',
+    #     null=True,
+    #     verbose_name=_("role"),
+    #     on_delete=db.SET_NULL,
+    # )
+    # service = db.ForeignKey(
+    #     ServiceCatalog,
+    #     default=None,
+    #     null=True,
+    #     on_delete=db.SET_NULL,
+    # )
+
+    # TODO: fixme
+    # device_environment = db.ForeignKey(
+    #     DeviceEnvironment,
+    #     default=None,
+    #     null=True,
+    #     on_delete=db.SET_NULL,
+    # )
     done_plugins = db.TextField(
         _("done plugins"),
         blank=True,
@@ -265,4 +267,5 @@ class DeploymentPoll(db.Model, WithConcurrentGetOrCreate):
 
 
 # Import all the plugins
-import ralph.deployment.plugins   # noqa
+# FIXME:
+#import ralph.deployment.plugins   # noqa

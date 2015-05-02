@@ -17,8 +17,8 @@ import time
 from django.conf import settings
 from django.db import models as db
 
-from ralph.discovery.models_device import Device
-from ralph.discovery.models_network import IPAddress
+from ralph_assets.models import Asset, IPAddress
+#from ralph.discovery.models_network import IPAddress
 from ralph.scan.data import (
     append_merged_proposition,
     device_from_data,

@@ -632,3 +632,72 @@ class CIOwner(TimeTrackable, WithConcurrentGetOrCreate):
     @property
     def sAMAccountName(self):
         return self.profile.user.username
+
+
+class DeviceEnvironmentManager(models.Manager):
+    def get_query_set(self):
+        return super(DeviceEnvironmentManager, self).get_query_set().filter(
+            type__name=CI_TYPES.ENVIRONMENT,
+            state=CI_STATE_TYPES.ACTIVE,
+        )
+
+
+class DeviceEnvironment(CI):
+    """
+    Catalog of environment where device is used, like: prod, test, ect.
+    """
+    objects = DeviceEnvironmentManager()
+
+    class Meta:
+        proxy = True
+
+    def __unicode__(self):
+        return self.name
+
+
+class ServiceCatalogManager(models.Manager):
+    def get_query_set(self):
+
+# FIXME: global?
+        SHOW_ONLY_SERVICES_CALCULATED_IN_SCROOGE=0
+        if SHOW_ONLY_SERVICES_CALCULATED_IN_SCROOGE:
+            ids = CIAttributeValue.objects.filter(
+                attribute__pk=7,
+                value_boolean__value=True,
+                ci__type=CI_TYPES.SERVICE,
+            ).values('ci')
+            services = super(
+                ServiceCatalogManager,
+                self,
+            ).get_query_set().filter(
+                state=CI_STATE_TYPES.ACTIVE,
+                id__in=ids,
+            )
+        else:
+            services = super(
+                ServiceCatalogManager, self,
+            ).get_query_set().filter(
+                type=CI_TYPES.SERVICE,
+                state=CI_STATE_TYPES.ACTIVE,
+            )
+        return services
+
+
+class ServiceCatalog(CI):
+    """
+    Catalog of services where device is used, like: allegro.pl
+    """
+    objects = ServiceCatalogManager()
+
+    class Meta:
+        proxy = True
+
+    def __unicode__(self):
+        return self.name
+
+    def get_environments(self):
+        env_ids_from_service = CIRelation.objects.filter(
+            parent=self.id,
+        ).values('child__id')
+        envs = DeviceEnvironment.objects.filter(id__in=env_ids_from_service)
+        return envs

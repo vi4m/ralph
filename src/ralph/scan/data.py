@@ -14,7 +14,7 @@ from django.db import IntegrityError
 from django.db import models as db
 from django.conf import settings
 
-from ralph.discovery.models_component import (
+from ralph_assets.models import (
     ComponentModel,
     ComponentType,
     DiskShare,
@@ -27,16 +27,10 @@ from ralph.discovery.models_component import (
     Processor,
     Storage,
     Software,
-)
-from ralph.discovery.models_network import (
     IPAddress,
-)
-from ralph.discovery.models_device import (
+
     Connection,
     ConnectionType,
-    Device,
-    DeviceModel,
-    DeviceType,
     NetworkConnection,
 )
 from ralph.scan.merger import merge as merge_component

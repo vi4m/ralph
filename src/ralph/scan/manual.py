@@ -24,7 +24,7 @@ import rq
 from django.conf import settings
 from django.utils.importlib import import_module
 
-from ralph.discovery.models import IPAddress, Network
+from ralph_assets.models import IPAddress, Network
 from ralph.scan.automerger import save_job_results
 from ralph.scan.autoscan import autoscan_address
 from ralph.scan.errors import NoQueueError

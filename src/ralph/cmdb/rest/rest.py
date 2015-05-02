@@ -9,7 +9,8 @@ from __future__ import unicode_literals
 from django.views.decorators.csrf import csrf_exempt
 
 from ralph.cmdb.integration.puppet import PuppetAgentsImporter
-from ralph.discovery.tasks import run_chain
+#from ralph.discovery.tasks import run_chain
+# FIXME: run_chain
 from ralph.util.views import jsonify
 
 

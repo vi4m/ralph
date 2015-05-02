@@ -40,12 +40,13 @@ class ProfileBoundPermInline(ForeignKeyAutocompleteTabularInline):
         'modified',
         'created_by',
         'modified_by',
-        'role',
+# FIXME:
+#       'role',
         'group'
     ]
-    related_search_fields = {
-        'venture': ['^name'],
-    }
+#    related_search_fields = {
+#        'venture': ['^name'],
+#    }
     formset = ProfileInlineFormSet
 
     def __init__(self, parent_model, admin_site):
@@ -174,12 +175,13 @@ class GroupBoundPermInline(ForeignKeyAutocompleteTabularInline):
         'modified',
         'created_by',
         'modified_by',
-        'role',
+# FIXME
+#        'role',
         'profile'
     ]
-    related_search_fields = {
-        'venture': ['^name'],
-    }
+    # related_search_fields = {
+    #     'venture': ['^name'],
+    # }
 
 
 class CustomGroupAdmin(GroupAdmin):

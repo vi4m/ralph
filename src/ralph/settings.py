@@ -86,7 +86,7 @@ INSTALLED_APPS = [
     #'ralph.dnsedit',
 #    'ralph.util',
 #    'ralph.deployment',
-#    'ralph.scan',
+    'ralph.scan',
 #    'ralph.notifications',
     'ralph_assets',
     'rest_framework',

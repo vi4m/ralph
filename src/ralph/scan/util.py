@@ -50,8 +50,8 @@ def get_pending_changes():
     all_changes = ScanSummary.objects.filter(modified__gt=delta)
     # see also ScanList.handle_search_data (similar condition)
     new, changed = (
-        all_changes.filter(ipaddress__device=None).count(),
-        all_changes.filter(ipaddress__device__isnull=False).count(),
+        all_changes.filter(ipaddress__asset=None).count(),
+        all_changes.filter(ipaddress__asset__isnull=False).count(),
     )
     return PendingChanges(new, changed)
 

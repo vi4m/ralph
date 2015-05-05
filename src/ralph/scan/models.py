@@ -31,6 +31,7 @@ class ScanSummary(db.Model, WithConcurrentGetOrCreate):
     created = db.DateTimeField(auto_now=False, auto_now_add=True)
     modified = db.DateTimeField(auto_now=True, auto_now_add=True)
 
+    modified = db.DateTimeField(auto_now=True, auto_now_add=True)
     @property
     def ipaddress(self):
         ipaddresses = self.ipaddress_set.all()

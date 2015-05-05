@@ -32,6 +32,7 @@ setup(
     package_dir={'': 'src'},
     zip_safe=False,  # because templates are loaded from file path
     install_requires=[
+	'django-polymorphic',
         'bob-ajax-selects==1.6.0',
         'djangorestframework==2.4.3',
         'django-bob==1.11.0',

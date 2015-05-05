@@ -15,7 +15,7 @@ from django.conf import settings
 # from django.contrib import messages
 # from django.core.exceptions import ImproperlyConfigured
 # from django.core.paginator import Paginator
-# from django.core.urlresolvers import reverse
+from django.core.urlresolvers import reverse
 # from django.db import models as db, transaction
 # from django.http import HttpResponseRedirect, HttpResponseForbidden, Http404
 # from django.shortcuts import get_object_or_404
@@ -350,11 +350,11 @@ class BaseMixin(MenuMixin, ACLGateway):
             self.request.GET.urlencode(),
         )
 
-    # def get_tab_items(self):
-    #     details = self.kwargs.get('details', 'info')
-    #     profile = self.request.user.get_profile()
-    #     has_perm = profile.has_perm
-    #     tab_items = []
+    def get_tab_items(self):
+        details = self.kwargs.get('details', 'info')
+        profile = self.request.user.get_profile()
+        has_perm = profile.has_perm
+        tab_items = []
     #     venture = (
     #         self.venture if self.venture and self.venture != '*' else None
     #     ) or (
